@@ -1,5 +1,6 @@
 package test;
 
+import java.io.File;
 import java.net.UnknownHostException;
 import java.util.List;
 
@@ -11,29 +12,35 @@ public class TestForTokenziation {
 	private static String DBIP = "7.67.121.193";
 	private static int DBPort = 27017;
 	private static String DBName = "irmongodb";
-	private static DB db,new_db_query;
+	private static DB db;
 	private static MongoClient mongoClient;
 	public static List<String> allDBList;
 	
 	
 	public static void main(String[] args){
-		Connection();
-		new_db_query = mongoClient.getDB("IRDB");
-		getDatabaseName();
+		ConnectionToMongoDB();
+		GetDatabaseName(); 
+		GetFileNameForDataPrepocess();
 	}
-	public static void Connection(){
+	
+	public static void GetFileNameForDataPrepocess(){
+		File f = new File("");
+		
+		
+	}
+	public static void ConnectionToMongoDB(){
 		try{
-			mongoClient = new MongoClient("localhost",DBPort);
+			//mongoClient = new MongoClient("localhost",DBPort);
 			mongoClient = new MongoClient(DBIP,DBPort);
 			System.out.println("連線成功到 :" + DBIP +":"+DBPort+ "\n\tDBName: "+DBName+"\n");
-			db = mongoClient.getDB(DBName);
 		}
 		catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println("失敗連線到 :" + DBIP +":"+DBPort+ "\n\tDBName: "+DBName+"\n"+"建議在試一次!!");
 		}
+		
 	}
-	public static void getDatabaseName(){  //得到Database 之 NameList
+	public static void GetDatabaseName(){  //得到Database 之 NameList
 		allDBList = mongoClient.getDatabaseNames(); 
 		for(String s:allDBList){
 			System.out.println(s);
