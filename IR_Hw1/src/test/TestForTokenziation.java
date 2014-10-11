@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -33,7 +35,7 @@ public class TestForTokenziation {
 	       //System.out.println(enc);
 		
 	}
-
+	
 	public static void ReadAnFile(String filename){   //¦¨¥\Åª¨ú³Ì¤jÀÉ®× ¦ý·|¥X²{ ? (¦³½s½X°ÝÃD¦s¦b)
 		
 		String path = "C:/Users/Vicky/Desktop/resource_raw_data/"+filename;
@@ -61,14 +63,110 @@ public class TestForTokenziation {
 		
 		
 	}
+
+	public static boolean isNumeric(String str)
+	{
+	  NumberFormat formatter = NumberFormat.getInstance();
+	  ParsePosition pos = new ParsePosition(0);
+	  formatter.parse(str, pos);
+	  return str.length() == pos.getIndex();
+	}
+	public static boolean isAlpha(String name) {
+		return name.matches("[a-zA-Z]+");
+	}
+	
 	//¤Á°£line->tokens
 	public static void Tokenziation(String line){
 		String[] tokens = line.split(" ");
 		for(int i=0;i<tokens.length;i++){
+			tokens[i] = tokens[i].trim();
 			tokens[i] = tokens[i].replaceAll("[\\pP|~|$|^|<|>|\\||\\+|=]*", "");
-        	
-			System.out.println(tokens[i]);
+			tokens[i] = tokens[i].replaceAll("\\s+", "");
+			tokens[i] = tokens[i].replaceAll("'","");
+			//tokens[i] = tokens[i].replaceAll("[\\s+|\\t+]*", "");
+			
+			
+			//tokens[i] = tokens[i].replaceAll("\n\n+", "\n").replaceAll("^\n+", "");
+			if(!tokens[i].isEmpty() && !tokens[i].equals("„Ï ")){
+				
+				if(isNumeric(tokens[i])){
+	        		//System.out.println("«¢«¢«¢§Ú¬O¼Æ¦r: "+tokens[i]);
+	        	}
+	        	else if(!isNumeric(tokens[i])){
+					if(isAlpha(tokens[i])){
+						System.out.println("§Ú¬O¯Â­^¤å¦r: "+tokens[i]);
+						String lowercasestring = CaseFolding(tokens[i]); //¤j¤p¼gÂà´« ¥þ³¡Âà¦¨¤p¼g
+						if(!lowercasestring.equals(tokens[i])){
+							System.out.println("§ï¹Lªº¤j¤p¼g³æ¦r¡G "+lowercasestring);
+						}
+						//¨Ï¥ÎPorterºtºâªk¶i¦æµü·FÁÙ­ì stemming ->lemma(µü¤¸)
+						if(PorterStemming_1(lowercasestring)){
+							String lemma = PorterStemming_2(lowercasestring);
+							System.out.println("lemma¡G "+lemma);
+						}
+						else{
+							System.out.println("¦¹³æ¦r¤£·|¯Ç¤J¸ê®Æ®w¡G "+lowercasestring);
+						}
+					}
+					else{
+						//¥i¯à¬O¤¤¤å¡A»Ý­n§âstopword®³±¼¶Ü? 
+						//°w¹ï¤¤¤å¥y¤l»P«D¯Â­^¤å¡B«D¯Â¼Æ¦r¥y¤l¥H©T©wªø«×¶i¦æ¥y¤l¤Á³Î
+						//CutSentenceInFitLong(tokens[i],1);  
+						//CutSentenceInFitLong(tokens[i],2);
+						CutSentenceInFitLong(tokens[i],10); 
+					}
+	        	}
+	        	else{
+	        		System.out.println("§Ú¬Æ»ò³£¤£¬O¡G"+tokens[i]);
+	        	}
+			}
+			else{
+				//System.out.println("§Ú¬O½¼±K¡G"+tokens[i]);
+			}
         }
+	}
+	public static boolean PorterStemming_1(String originalterm){
+		
+		Porter porterstemming = new Porter();
+		if(!porterstemming.containsVowel(originalterm))return false;
+		
+		return true;
+	}
+	public static String PorterStemming_2(String originalterm){
+		Porter porterstemming = new Porter();
+		String lemmatemp="";
+		NewString str = new NewString();
+		
+		lemmatemp = porterstemming.Clean(originalterm); //²M°£¡y'¡zµ¥©_©Ç¦r¤¸
+		if(porterstemming.hasSuffix(originalterm,"ing",str)){   //¥h°£ing ¯S©w¦r¤¸
+			lemmatemp = str.str;
+		}
+		String s1 = porterstemming.step1(lemmatemp);
+        String s2 = porterstemming.step2(s1);
+        String s3= porterstemming.step3(s2);
+        String s4= porterstemming.step4(s3);
+        String s5= porterstemming.step5(s4);
+        lemmatemp = s5;
+		//System.out.println(lemmatemp);
+		return lemmatemp;
+	}
+	public static String CaseFolding(String englishterm){
+		return englishterm.toLowerCase();
+	}
+	public static void CutSentenceInFitLong(String sentence,int fitlong){
+		
+		int begin =0;
+		while(sentence.length()>0){
+			if(sentence.length() < fitlong){
+				System.out.println("¤Á¹Lªº³á: "+sentence);
+				return;
+			}else{
+				String subsentence = "";
+				subsentence = sentence.substring(0,fitlong);
+				sentence =  sentence.substring(fitlong,sentence.length());
+				System.out.println("¤Á¹Lªº³á: "+subsentence);
+			}
+		}
 	}
 	
 	public static void ReadAnFileTest(String filename){   //¦¨¥\Åª¨ú³Ì¤jÀÉ®× ¦ý·|¥X²{ ? (¦³½s½X°ÝÃD¦s¦b)
@@ -77,17 +175,14 @@ public class TestForTokenziation {
 		System.out.println("\t***Using encoding***");
 		try{              
             FileInputStream fis = new FileInputStream(path);  
-            byte[] lineb = new byte[5000];  //Åª¨ú¨C¤@¦æªº¤j¤p
+            byte[] lineb = new byte[5000];  //Åª¨ú³æ¦ì¤j¤p
             int rc = 0;  
             while((rc = fis.read(lineb))> 0){  
             	//String utf8_line = new String(lineb);
                 String utf8_line = new String(lineb,"UTF-8");  //¥HUTF-8¬°¹w³]½s½X
                 //System.out.println(utf8_line); 
-                Tokenziation(utf8_line);
-                
-                
-                
-                lineb = new byte[5000];
+                Tokenziation(utf8_line);//µü±ø¤Æ
+                lineb = new byte[5000]; //²M°£¸ê°T ¥H¨¾¤îÂÂ¸ê®Æ­«´_¬ö¿ý
             }  
             fis.close();  
         }catch(FileNotFoundException e){  
