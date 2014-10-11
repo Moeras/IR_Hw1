@@ -29,6 +29,8 @@ public class TestForTokenziation {
 		//GetDatabaseName(); 
 		GetFileNameForDataPrepocess();
 		//TestFunction();
+		 //String enc = System.getProperty("file.encoding");
+	       //System.out.println(enc);
 		
 	}
 
@@ -44,7 +46,7 @@ public class TestForTokenziation {
             
             
             while((rc = fis.read(lineb))> 0){  
-                String utf8_line = new String(lineb,"UTF-8");  
+                String utf8_line = new String(lineb,"UTF-8");  //以UTF-8為預設編碼
                 System.out.println(utf8_line); 
                 lineb = new byte[5000];
             }  
@@ -59,35 +61,49 @@ public class TestForTokenziation {
 		
 		
 	}
+	//切除line->tokens
+	public static void Tokenziation(String line){
+		String[] tokens = line.split(" ");
+		for(int i=0;i<tokens.length;i++){
+			tokens[i] = tokens[i].replaceAll("[\\pP|~|$|^|<|>|\\||\\+|=]*", "");
+        	
+			System.out.println(tokens[i]);
+        }
+	}
 	
-	
-	public static void ReadAnFile2(String filename){
+	public static void ReadAnFileTest(String filename){   //成功讀取最大檔案 但會出現 ? (有編碼問題存在)
 		
-		Scanner scanner = null;
 		String path = "C:/Users/Vicky/Desktop/resource_raw_data/"+filename;
 		System.out.println("\t***Using encoding***");
 		try{              
             FileInputStream fis = new FileInputStream(path);  
-            byte[] lineb = new byte[2000];  //讀取每一行的大小
+            byte[] lineb = new byte[5000];  //讀取每一行的大小
             int rc = 0;  
-            StringBuffer sb= new StringBuffer("");  
-            
-            
             while((rc = fis.read(lineb))> 0){  
-                String utf8 = new String(lineb,"UTF-8");               
-                sb.append(utf8+"\n"); 
+            	//String utf8_line = new String(lineb);
+                String utf8_line = new String(lineb,"UTF-8");  //以UTF-8為預設編碼
+                //System.out.println(utf8_line); 
+                Tokenziation(utf8_line);
                 
+                
+                
+                lineb = new byte[5000];
             }  
             fis.close();  
-            System.out.println(sb.toString()); 
-            lineb = null;            
         }catch(FileNotFoundException e){  
             e.printStackTrace();  
         }catch(IOException ioe){  
             ioe.printStackTrace();  
         }  
 		
+		
+		
+		
+		
+		
 	}
+	
+	
 	
 	public static void GetFileNameForDataPrepocess(){
 		//File f = new File("C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data");  //
@@ -107,7 +123,7 @@ public class TestForTokenziation {
 		for(int i=0;i<fileList.size();i++){
 			file = fileList.get(i);
             System.out.println(file); //印出資料夾內的檔名
-            ReadAnFile(file);    
+            ReadAnFileTest(file);    
         }
 				
 	}
