@@ -31,8 +31,8 @@ public class TestForTokenziation {
 		//GetDatabaseName(); 
 		GetFileNameForDataPrepocess();
 		//TestFunction();
-		 //String enc = System.getProperty("file.encoding");
-	       //System.out.println(enc);
+		//String enc = System.getProperty("file.encoding");
+        //System.out.println(enc);
 		
 	}
 	
@@ -58,10 +58,6 @@ public class TestForTokenziation {
         }catch(IOException ioe){  
             ioe.printStackTrace();  
         }  
-		
-		
-		
-		
 	}
 
 	public static boolean isNumeric(String str)
@@ -76,7 +72,7 @@ public class TestForTokenziation {
 	}
 	
 	//切除line->tokens
-	public static void Tokenziation(String line){
+	public static void Tokenziation(String line,int fileid){
 		String[] tokens = line.split(" ");
 		for(int i=0;i<tokens.length;i++){
 			tokens[i] = tokens[i].trim();
@@ -111,9 +107,9 @@ public class TestForTokenziation {
 					else{
 						//可能是中文，需要把stopword拿掉嗎? 
 						//針對中文句子與非純英文、非純數字句子以固定長度進行句子切割
-						//CutSentenceInFitLong(tokens[i],1);  
-						//CutSentenceInFitLong(tokens[i],2);
-						CutSentenceInFitLong(tokens[i],10); 
+						//CutSentenceInFitLength(tokens[i],1);  
+						//CutSentenceInFitLength(tokens[i],2);
+						CutSentenceInFitLength(tokens[i],10); 
 					}
 	        	}
 	        	else{
@@ -153,7 +149,7 @@ public class TestForTokenziation {
 	public static String CaseFolding(String englishterm){
 		return englishterm.toLowerCase();
 	}
-	public static void CutSentenceInFitLong(String sentence,int fitlong){
+	public static void CutSentenceInFitLength(String sentence,int fitlong){
 		
 		int begin =0;
 		while(sentence.length()>0){
@@ -169,7 +165,7 @@ public class TestForTokenziation {
 		}
 	}
 	
-	public static void ReadAnFileTest(String filename){   //成功讀取最大檔案 但會出現 ? (有編碼問題存在)
+	public static void ReadAnFileTest(String filename,int fileid){   //成功讀取最大檔案 但會出現 ? (有編碼問題存在)
 		
 		String path = "C:/Users/Vicky/Desktop/resource_raw_data/"+filename;
 		System.out.println("\t***Using encoding***");
@@ -181,7 +177,7 @@ public class TestForTokenziation {
             	//String utf8_line = new String(lineb);
                 String utf8_line = new String(lineb,"UTF-8");  //以UTF-8為預設編碼
                 //System.out.println(utf8_line); 
-                Tokenziation(utf8_line);//詞條化
+                Tokenziation(utf8_line,fileid);//詞條化
                 lineb = new byte[5000]; //清除資訊 以防止舊資料重復紀錄
             }  
             fis.close();  
@@ -190,16 +186,7 @@ public class TestForTokenziation {
         }catch(IOException ioe){  
             ioe.printStackTrace();  
         }  
-		
-		
-		
-		
-		
-		
 	}
-	
-	
-	
 	public static void GetFileNameForDataPrepocess(){
 		//File f = new File("C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data");  //
 		File f = new File("C:/Users/Vicky/Desktop/resource_raw_data"); //測試用
@@ -215,17 +202,19 @@ public class TestForTokenziation {
 		}
 		
 		String file = "";
+		int fileid=0;
 		for(int i=0;i<fileList.size();i++){
 			file = fileList.get(i);
             System.out.println(file); //印出資料夾內的檔名
-            ReadAnFileTest(file);    
+            fileid = i+1;
+            ReadAnFileTest(file,fileid);    
         }
 				
 	}
 	public static void ConnectionToMongoDB(){
 		try{
-			//mongoClient = new MongoClient("localhost",DBPort);
-			mongoClient = new MongoClient(DBIP,DBPort);
+			mongoClient = new MongoClient("localhost",DBPort);
+			//mongoClient = new MongoClient(DBIP,DBPort);
 			System.out.println("連線成功到 :" + DBIP +":"+DBPort+ "\n\tDBName: "+DBName+"\n");
 		}
 		catch (UnknownHostException e) {
