@@ -13,14 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 
 
 public class TestForTokenziation {
 	private static String DBIP = "7.67.121.193";
 	private static int DBPort = 27017;
-	private static String DBName = "irmongodb";
+	private static String DBName = "IRTestDB";
 	private static DB db;
 	private static MongoClient mongoClient;
 	public static List<String> allDBList;
@@ -29,10 +34,76 @@ public class TestForTokenziation {
 	public static void main(String[] args){
 		//ConnectionToMongoDB();
 		//GetDatabaseName(); 
-		GetFileNameForDataPrepocess();
-		//TestFunction();
+		//GetFileNameForDataPrepocess();
+		TestDBQurry_invertfile(99,"AMY"); //fileid,term
 		//String enc = System.getProperty("file.encoding");
         //System.out.println(enc);
+		
+	}
+	public static void TestDBQurry_invertfile(int fileid,String term){
+		
+		//取得資料Dictionary辭典(collection == table) 
+		MongoClient mongoClient;
+		DBCollection collection_Dictionary = null;
+		DB db;
+		try {
+			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
+			db = mongoClient.getDB("IR_Hw1_TestDB");
+			collection_Dictionary = db.getCollection("Dictionary");
+			
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		//判斷該term是否建立在辭典過 
+		BasicDBObject allQuery = new BasicDBObject();
+		BasicDBObject fields = new BasicDBObject();
+		allQuery.put("term", term);
+	 	DBCursor cursor = collection_Dictionary.find(allQuery, fields);
+	 	System.out.println(cursor.size());
+	 	
+	 	//沒有建立該term的document的紀錄  create 一個 document 並且更新invertedindexlist 
+	 	if(cursor.size()==0){
+	 		ArrayList invertindex = new ArrayList();
+			invertindex.add(fileid);
+	 		BasicDBObject document = new BasicDBObject();
+	 		document.put("term", term);
+	 		document.put("termfrequency",1);
+	 		document.put("invertedindexlist",invertindex);
+	 		collection_Dictionary.insert(document);
+	    }
+	 	//已經建立於Dictionary中 更新termfrequency 和  invertedindexlist
+	 	else
+	 	{
+	 		// 更新termfrequency
+	 		BasicDBObject newDocument = 
+					new BasicDBObject().append("$inc", 
+					new BasicDBObject().append("termfrequency",1)); 
+	 		collection_Dictionary.update(new BasicDBObject().append("term", term), newDocument);
+	 		// 更新 invertedindexlist
+	 		BasicDBObject updateQuery = new BasicDBObject("term",term);
+	 		BasicDBObject updateCommand = new BasicDBObject("$push", new BasicDBObject("invertedindexlist",fileid));
+			collection_Dictionary.update(updateQuery,updateCommand);
+	 	}
+	    //System.out.println(cursor.size());
+	    //System.out.println(result.iterator().next());
+	    
+	    
+		//更新反向索引陣列 invertedindexlist,根據term詞項搜尋,再將文章ID予以紀錄
+		//BasicDBObject updateQuery = new BasicDBObject("term",term);
+		//BasicDBObject updateCommand = new BasicDBObject("$push", new BasicDBObject("invertedindexlist",fileid));
+		//collection_Dictionary.update(updateQuery,updateCommand);
+		//System.out.println(collection_Dictionary.findOne().toString());
+		
+		//updateQuery.put("invertedindexlist",fileid);
+		
+		//ArrayList invertindex = new ArrayList();
+		//invertindex.add(fileid);
+		
+		BasicDBObject newDocument = 
+				new BasicDBObject().append("$inc", 
+				new BasicDBObject().append("termfrequency",1)); 
+	    
+	    
 		
 	}
 	
