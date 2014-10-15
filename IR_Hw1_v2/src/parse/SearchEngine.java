@@ -28,7 +28,7 @@ public class SearchEngine {
 	private static DBCollection collection_Dictionary = null;
 	private static ArrayList<String> fileList;
 	private static int Processing_DocId =0;
-	
+	private static int Processing_DoId_Position = 0;
 	
 	public static void main(String[] args){
 		
@@ -42,7 +42,7 @@ public class SearchEngine {
 		//int min =0,max=fileList.size(); //檔案從1開始
 		//Parse(min,max);
 		
-		String test_term = "ttttt";
+		String test_term = "真的假的";
 		int test_docid = 77;
 		int test_position = 78;
 		
@@ -78,29 +78,19 @@ public class SearchEngine {
 	 			ArrayList position_array = new ArrayList();
 				position_array.add(Position);
 				
-				//ArrayList newInvertedFile = new ArrayList();
-				//newInvertedFile.add(new BasicDBObject("DocID",DocId));
-				//newInvertedFile.add(new BasicDBObject("LocalFrequency",1));
-				//newInvertedFile.add(new BasicDBObject("Position",position_array));
-				
-				
 				DBObject Insert_Document = new BasicDBObject("InvertedFileList",
 						new BasicDBObject("DocID",DocId).append("LocalFrequency",1).append("Position",position_array));
-				//Insert_Document.put("InvertedFileList", newInvertedFile);
-				//Insert_Document.append("DocID",DocId);
-				//Insert_Document.append("LocalFrequency",1);
-				//Insert_Document.append("Position",position_array);
 				
 				DBObject updateQuery = new BasicDBObject("Term", Term);
 				DBObject updateCommand = new BasicDBObject("$push", Insert_Document);
 				collection_Dictionary.update(updateQuery,updateCommand);
-				//collection_Dictionary.update(updateQuery,new BasicDBObject("InvertedFileList",Insert_Document));
 				
 	 		}
-	 		else{ //這個term已經建過這個Document的資料的 只需要更新其invertedfile即可
+	 		 //這個term已經建過這個Document的資料的 只需要更新其invertedfile即可
+	 		else{
 	 			System.out.println("//這個term已經建過這個Document的資料的 只需要更新其invertedfile即可");
+	 			
 	 			//更新InvertedFileList 的Position 
-	 							
 				BasicDBObject updateQuery = new BasicDBObject("Term",Term);
 				updateQuery.put("InvertedFileList.DocID",DocId);
 		 		BasicDBObject updateCommand = new BasicDBObject("$push", new BasicDBObject("InvertedFileList.$.Position",Position));
@@ -112,7 +102,6 @@ public class SearchEngine {
 				BasicDBObject updateDocument = 
 						new BasicDBObject().append("$inc", 
 						new BasicDBObject().append("InvertedFileList.$.LocalFrequency",1)); 
-				
 		 		collection_Dictionary.update(updateQuery_Frequency,updateDocument);
 				
 	 		}
@@ -129,11 +118,6 @@ public class SearchEngine {
 					append("LocalFrequency", 1).
 					append("Position", position_array));
 			
-			//BasicDBObject newInnerDocument = new BasicDBObject();
-			//newInnerDocument.put("DocID",DocId);
-			//newInnerDocument.put("LocalFrequency", 1);
-			//newInnerDocument.put("Position", position_array);
-			
 			BasicDBObject newDocument = new BasicDBObject();
 			newDocument.put("Term",Term);
 			newDocument.put("IDF",1);
@@ -142,8 +126,8 @@ public class SearchEngine {
 			collection_Dictionary.insert(newDocument);
 			
 		}
-	
 	}
+	
 	//判斷該term是否曾經記錄過這個Document
 	public static boolean isTermsDocumentExist(String checkterm,int checkdocid){
 		BasicDBObject allQuery = new BasicDBObject();
@@ -192,15 +176,20 @@ public class SearchEngine {
 	        	}
 	        	else if(!isNumeric(tokens[i])){
 					if(isAlpha(tokens[i])){
-						System.out.println("我是純英文字: "+tokens[i]);
+						//System.out.println("我是純英文字: "+tokens[i]);
 						String lowercasestring = CaseFolding(tokens[i]); //大小寫轉換 全部轉成小寫
-						if(!lowercasestring.equals(tokens[i])){
-							System.out.println("改過的大小寫單字： "+lowercasestring);
-						}
+						
+						//if(!lowercasestring.equals(tokens[i])){
+							//System.out.println("改過的大小寫單字： "+lowercasestring);
+						//}
+						
 						//使用Porter演算法進行詞幹還原 stemming ->lemma(詞元)
 						if(PorterStemming_1(lowercasestring)){
 							String lemma = PorterStemming_2(lowercasestring);
 							System.out.println("lemma： "+lemma);
+							System.out.println("建檔,純英文字: "+lemma);
+							DBQurry_updateInvertfile(lemma,DocId,Processing_DoId_Position);
+							Processing_DoId_Position++;
 						}
 						else{
 							System.out.println("此單字不會納入資料庫： "+lowercasestring);
@@ -210,36 +199,44 @@ public class SearchEngine {
 						//可能是中文數字特殊符號交雜之句子  
 						//針對中文句子與非純英文、非純數字句子以固定長度進行句子切割
 						
-						//CutSentenceInFitLength(tokens[i],1);  
-						//CutSentenceInFitLength(tokens[i],2);
-						CutSentenceInFitLength(tokens[i],10); 
+						//CutSentenceInFitLength(tokens[i],1,DocId);  
+						//CutSentenceInFitLength(tokens[i],2,DocId);
+						CutSentenceInFitLength(tokens[i],10,DocId); 
 					}
 	        	}
 	        	else{
-	        		System.out.println("我甚麼都不是："+tokens[i]);
+	        		System.out.println("此單字不會納入資料庫：我甚麼都不是："+tokens[i]);
 	        	}
 			}
 			else{
-				//System.out.println("我是蝦密："+tokens[i]);
+				System.out.println("此單字不會納入資料庫：我是蝦密："+tokens[i]);
 			}
         }
 		
 	}
-	public static void CutSentenceInFitLength(String sentence,int fitlong){
+	
+	//將中英文常句子切除一個
+	public static void CutSentenceInFitLength(String sentence,int fitlong,int DocId){
 		
 		int begin =0;
 		while(sentence.length()>0){
 			if(sentence.length() < fitlong){
-				System.out.println("切過的喔: "+sentence);
+				DBQurry_updateInvertfile(sentence,DocId,Processing_DoId_Position);
+				Processing_DoId_Position++;
+				System.out.println("建檔,切過的喔: "+sentence);
 				return;
 			}else{
 				String subsentence = "";
 				subsentence = sentence.substring(0,fitlong);
 				sentence =  sentence.substring(fitlong,sentence.length());
-				System.out.println("切過的喔: "+subsentence);
+				DBQurry_updateInvertfile(sentence,DocId,Processing_DoId_Position);
+				Processing_DoId_Position++;
+				System.out.println("建檔,切過的喔: "+subsentence);
 			}
 		}
 	}
+	
+	//PorterStemming
 	public static boolean PorterStemming_1(String originalterm){
 		
 		Porter porterstemming = new Porter();
@@ -247,6 +244,8 @@ public class SearchEngine {
 		
 		return true;
 	}
+	
+	//PorterStemming
 	public static String PorterStemming_2(String originalterm){
 		
 		Porter porterstemming = new Porter();
@@ -266,6 +265,7 @@ public class SearchEngine {
 		//System.out.println(lemmatemp);
 		return lemmatemp;
 	}
+	
 	//全部改為小寫
 	public static String CaseFolding(String englishterm){
 		return englishterm.toLowerCase();
@@ -286,7 +286,7 @@ public class SearchEngine {
 		
 	}
 	
-	
+	//讀完檔 並且依據一行一行讀取 並開始切除token
 	public static void ReadAnFile(String docname,int docid){
 		
 		String path = "C:/Users/Vicky/Desktop/resource_raw_data/"+docname;
@@ -311,6 +311,7 @@ public class SearchEngine {
 		
 	}
 	
+	//讀取選取的檔案個數
 	public static void Parse(int min,int max){
 		
 		String document_name = "";
@@ -320,13 +321,12 @@ public class SearchEngine {
 			System.out.println("Parse : No："+i+" Name: "+document_name);
 			document_id = i+1;
 			Processing_DocId = document_id;
+			Processing_DoId_Position = 1;
 			ReadAnFile(document_name,document_id);
 		}
-		
 	}
-	
-	
-	
+		
+	//讀取資料夾中所有的檔案名稱
 	public static void GetAllFileName(){
 		//File f = new File("C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data");  //
 		File f = new File("C:/Users/Vicky/Desktop/resource_raw_data"); //測試用
@@ -344,6 +344,8 @@ public class SearchEngine {
 		
 				
 	}
+	
+	//連結MongoDB
 	public static void ConnectionMongoDB(){
 		try {
 			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
