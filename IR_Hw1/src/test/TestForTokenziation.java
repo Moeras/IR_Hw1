@@ -26,19 +26,62 @@ public class TestForTokenziation {
 	private static String DBIP = "7.67.121.193";
 	private static int DBPort = 27017;
 	private static String DBName = "IRTestDB";
-	private static DB db;
-	private static MongoClient mongoClient;
 	public static List<String> allDBList;
+	
+	
+	private static MongoClient mongoClient;
+	private static DBCollection collection_Dictionary = null;
+	private static DB db;
 	
 	
 	public static void main(String[] args){
 		//ConnectionToMongoDB();
 		//GetDatabaseName(); 
 		//GetFileNameForDataPrepocess();
+		String Term = "apple";
+		int DocId = 3;
+		String DocName = "djfsldkjfsldjfslda.txt";
+		int Position = 33;
+		
+		DBQurry_Invertfile(Term,DocId,DocName,Position);
+		
 		TestDBQurry_invertfile(99,"AMY"); //fileid,term
 		//String enc = System.getProperty("file.encoding");
         //System.out.println(enc);
 		
+	}
+	public static void DBQurry_Invertfile(String term,int docid,String docname,int position){
+		
+		//取得資料Dictionary辭典(collection == table) 
+		try {
+			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
+			db = mongoClient.getDB("IR_Hw1_TestDB");
+			collection_Dictionary = db.getCollection("Dictionary");
+		}
+		catch (UnknownHostException e){
+			e.printStackTrace();
+		}
+		if(isTermExist(term)){
+			
+		}
+		
+			 	
+		
+	}
+	//判斷該term是否建立在辭典過 
+	public static boolean isTermExist(String checkterm){
+		
+		BasicDBObject allQuery = new BasicDBObject();
+		BasicDBObject fields = new BasicDBObject();
+		allQuery.put("term", checkterm);
+	 	DBCursor cursor = collection_Dictionary.find(allQuery, fields);
+	 	System.out.println(cursor.size());
+	 	if(cursor.size()==0){
+	 		return false;
+	 	}else{
+	 		return true;
+	 	}
+	 	
 	}
 	public static void TestDBQurry_invertfile(int fileid,String term){
 		
@@ -98,12 +141,6 @@ public class TestForTokenziation {
 		
 		//ArrayList invertindex = new ArrayList();
 		//invertindex.add(fileid);
-		
-		BasicDBObject newDocument = 
-				new BasicDBObject().append("$inc", 
-				new BasicDBObject().append("termfrequency",1)); 
-	    
-	    
 		
 	}
 	
