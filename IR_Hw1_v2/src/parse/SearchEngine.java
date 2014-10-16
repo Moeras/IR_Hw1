@@ -25,9 +25,37 @@ public class SearchEngine {
 	private static String DBIP = "localhost";
 	private static int DBPort = 27017;
 	private static String DBName = "IR_Hw1_TestDB";
-	private static DBCollection collection_Dictionary = null;
+	private static DBCollection collection_DictionaryEn_a = null;
+	private static DBCollection collection_DictionaryEn_b = null;
+	private static DBCollection collection_DictionaryEn_c = null;
+	private static DBCollection collection_DictionaryEn_d = null;
+	private static DBCollection collection_DictionaryEn_e = null;
+	private static DBCollection collection_DictionaryEn_f = null;
+	private static DBCollection collection_DictionaryEn_g = null;
+	private static DBCollection collection_DictionaryEn_h = null;
+	private static DBCollection collection_DictionaryEn_i = null;
+	private static DBCollection collection_DictionaryEn_j = null;
+	private static DBCollection collection_DictionaryEn_k = null;
+	private static DBCollection collection_DictionaryEn_l = null;
+	private static DBCollection collection_DictionaryEn_m = null;
+	private static DBCollection collection_DictionaryEn_n = null;
+	private static DBCollection collection_DictionaryEn_o = null;
+	private static DBCollection collection_DictionaryEn_p = null;
+	private static DBCollection collection_DictionaryEn_q = null;
+	private static DBCollection collection_DictionaryEn_r = null;
+	private static DBCollection collection_DictionaryEn_s = null;
+	private static DBCollection collection_DictionaryEn_t = null;
+	private static DBCollection collection_DictionaryEn_u = null;
+	private static DBCollection collection_DictionaryEn_v = null;
+	private static DBCollection collection_DictionaryEn_w = null;
+	private static DBCollection collection_DictionaryEn_x = null;
+	private static DBCollection collection_DictionaryEn_y = null;
+	private static DBCollection collection_DictionaryEn_z = null;
+	private static DBCollection collection_DictionaryEn = null;
+	private static DBCollection collection_DictionaryCh = null;
+	private static DBCollection collection_ParseTime = null;
 	private static ArrayList<String> fileList;
-	private static int Processing_DocId =0;
+	public static int Processing_DocId =0;
 	private static int Processing_DoId_Position = 0;
 	
 	public static void main(String[] args){
@@ -36,44 +64,43 @@ public class SearchEngine {
 		ConnectionMongoDB();
 		
 		//取得所有要建檔之檔案名稱(txt檔名)
-		//GetAllFileName();
+		GetAllFileName();
 		
 		//指定建檔之文件範圍進行建檔(Text Mining)
-		//int min =0,max=fileList.size(); //檔案從1開始
-		//Parse(min,max);
+		int min =0,max=fileList.size(); //檔案從1開始
+		Parse(min,max);
 		
-		String test_term = "真的假的";
-		int test_docid = 77;
-		int test_position = 78;
+		//String test_term = "顆顆顆顆";
+		//int test_docid = 9089;
+		//int test_position = 666;
 		
-		DBQurry_updateInvertfile(test_term,test_docid,test_position);
+		//DBQurry_updateInvertfile(test_term,test_docid,test_position);
 	}
-	public static void DBQurry_updateInvertfile(String Term,int DocId,int Position){
-		//取得資料Dictionary辭典(collection == table) 
-		try {
-			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
-			db = mongoClient.getDB("IR_Hw1_TestDB");
-			collection_Dictionary = db.getCollection("Dictionary");
-		}
-		catch (UnknownHostException e){
-			e.printStackTrace();
-		}
+	public static void DBQurry_updateInvertfile(String Term,int DocId,int Position,Boolean EnForm){
+		
 		//該term已存在 要更新紀錄
-		if(isTermExist(Term)){
-			
-			// 更新termfrequency
-	 		if(Processing_DocId != DocId){
-				BasicDBObject updateDocument = 
-						new BasicDBObject().append("$inc", 
-						new BasicDBObject().append("IDF",1)); 
-		 		collection_Dictionary.update(new BasicDBObject().append("Term", Term), updateDocument);
-	 		}
+		if(isTermExist(Term,EnForm)){
 	 		
 	 		// 更新invertedindexlist
 	 		
 	 		//若這個term從來沒有建過這個document資料 建立新的InvertedFileIndex
-	 		if(!isTermsDocumentExist(Term,DocId)){
-	 			System.out.println("若這個term從來沒有建過這個document資料 建立新的InvertedFileIndex");
+	 		if(!isTermsDocumentExist(Term,DocId,EnForm)){
+	 			
+	 			//System.out.println("若這個term從來沒有建過這個document資料 建立新的InvertedFileIndex");
+	 			
+	 			// 更新termfrequency
+	 			BasicDBObject updateDocument = 
+						new BasicDBObject().append("$inc", 
+						new BasicDBObject().append("IDF",1)); 
+	 			if(EnForm){
+	 				collection_DictionaryEn.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 			}
+	 			else{
+	 				collection_DictionaryCh.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 			}
+	 			
+		 		//System.out.println("更新termfrequency");
+	 			
 	 			
 	 			ArrayList position_array = new ArrayList();
 				position_array.add(Position);
@@ -81,20 +108,34 @@ public class SearchEngine {
 				DBObject Insert_Document = new BasicDBObject("InvertedFileList",
 						new BasicDBObject("DocID",DocId).append("LocalFrequency",1).append("Position",position_array));
 				
+				
+				
 				DBObject updateQuery = new BasicDBObject("Term", Term);
 				DBObject updateCommand = new BasicDBObject("$push", Insert_Document);
-				collection_Dictionary.update(updateQuery,updateCommand);
+				if(EnForm){
+					collection_DictionaryEn.update(updateQuery,updateCommand);
+				}
+				else{
+					collection_DictionaryCh.update(updateQuery,updateCommand);
+				}
+				
 				
 	 		}
 	 		 //這個term已經建過這個Document的資料的 只需要更新其invertedfile即可
 	 		else{
-	 			System.out.println("//這個term已經建過這個Document的資料的 只需要更新其invertedfile即可");
+	 			//System.out.println("//這個term已經建過這個Document的資料的 只需要更新其invertedfile即可");
 	 			
 	 			//更新InvertedFileList 的Position 
 				BasicDBObject updateQuery = new BasicDBObject("Term",Term);
 				updateQuery.put("InvertedFileList.DocID",DocId);
 		 		BasicDBObject updateCommand = new BasicDBObject("$push", new BasicDBObject("InvertedFileList.$.Position",Position));
-				collection_Dictionary.update(updateQuery,updateCommand);
+		 		if(EnForm){
+		 			collection_DictionaryEn.update(updateQuery,updateCommand);
+		 		}
+		 		else{
+		 			collection_DictionaryCh.update(updateQuery,updateCommand);
+		 		}
+				
 				
 				//更新InvertedFileList 的Frequency
 				BasicDBObject updateQuery_Frequency = new BasicDBObject("Term",Term);
@@ -102,13 +143,20 @@ public class SearchEngine {
 				BasicDBObject updateDocument = 
 						new BasicDBObject().append("$inc", 
 						new BasicDBObject().append("InvertedFileList.$.LocalFrequency",1)); 
-		 		collection_Dictionary.update(updateQuery_Frequency,updateDocument);
+		 		if(EnForm){
+		 			collection_DictionaryEn.update(updateQuery_Frequency,updateDocument);
+		 		}
+		 		else{
+		 			collection_DictionaryCh.update(updateQuery_Frequency,updateDocument);
+		 		}
+				
+				
 				
 	 		}
 		}
 		//此Term沒有建檔過，需要建立新的詞項於Dictionary
 		else{
-			System.out.println("此Term沒有建檔過，需要建立新的詞項於Dictionary");
+			//System.out.println("此Term沒有建檔過，需要建立新的詞項於Dictionary");
 			
 			ArrayList position_array = new ArrayList();
 			position_array.add(Position);
@@ -122,20 +170,32 @@ public class SearchEngine {
 			newDocument.put("Term",Term);
 			newDocument.put("IDF",1);
 			newDocument.put("InvertedFileList",newInnerInnerDoc);
+			if(EnForm){
+				collection_DictionaryEn.insert(newDocument);
+			}
+			else{
+				collection_DictionaryCh.insert(newDocument);
+			}
 			
-			collection_Dictionary.insert(newDocument);
 			
 		}
 	}
 	
 	//判斷該term是否曾經記錄過這個Document
-	public static boolean isTermsDocumentExist(String checkterm,int checkdocid){
+	public static boolean isTermsDocumentExist(String checkterm,int checkdocid,Boolean EnForm){
 		BasicDBObject allQuery = new BasicDBObject();
 		BasicDBObject fields = new BasicDBObject();
 		allQuery.put("Term", checkterm);
 		allQuery.put("InvertedFileList.DocID",checkdocid);
-	 	DBCursor cursor = collection_Dictionary.find(allQuery, fields);
-	 	System.out.println(cursor.size());
+		DBCursor cursor;
+		if(EnForm){
+			cursor= collection_DictionaryEn.find(allQuery, fields);
+		}
+		else{
+			cursor = collection_DictionaryCh.find(allQuery, fields);
+		}
+	 	
+	 	//System.out.println(cursor.size());
 	 	if(cursor.size()==0){
 	 		return false;
 	 	}else{
@@ -144,13 +204,19 @@ public class SearchEngine {
 	}
 	
 	//判斷該term是否建立在辭典過 
-	public static boolean isTermExist(String checkterm){
+	public static boolean isTermExist(String checkterm,Boolean EnForm){
 		
 		BasicDBObject allQuery = new BasicDBObject();
 		BasicDBObject fields = new BasicDBObject();
 		allQuery.put("Term", checkterm);
-	 	DBCursor cursor = collection_Dictionary.find(allQuery, fields);
-	 	System.out.println(cursor.size());
+		DBCursor cursor;
+		if(EnForm){
+			cursor= collection_DictionaryEn.find(allQuery, fields);
+		}
+		else{
+			cursor= collection_DictionaryCh.find(allQuery, fields);
+		}
+	 	//System.out.println(cursor.size());
 	 	if(cursor.size()==0){
 	 		return false;
 	 	}else{
@@ -186,30 +252,31 @@ public class SearchEngine {
 						//使用Porter演算法進行詞幹還原 stemming ->lemma(詞元)
 						if(PorterStemming_1(lowercasestring)){
 							String lemma = PorterStemming_2(lowercasestring);
-							System.out.println("lemma： "+lemma);
-							System.out.println("建檔,純英文字: "+lemma);
-							DBQurry_updateInvertfile(lemma,DocId,Processing_DoId_Position);
+							//System.out.println("lemma： "+lemma);
+							//System.out.println("建檔,純英文字: "+lemma);
+							DBQurry_updateInvertfile(lemma,DocId,Processing_DoId_Position,true);
 							Processing_DoId_Position++;
 						}
 						else{
-							System.out.println("此單字不會納入資料庫： "+lowercasestring);
+							//System.out.println("此單字不會納入資料庫： "+lowercasestring);
 						}
 					}
 					else{
 						//可能是中文數字特殊符號交雜之句子  
 						//針對中文句子與非純英文、非純數字句子以固定長度進行句子切割
 						
-						//CutSentenceInFitLength(tokens[i],1,DocId);  
+						CutSentenceInFitLength(tokens[i],1,DocId);
 						//CutSentenceInFitLength(tokens[i],2,DocId);
-						CutSentenceInFitLength(tokens[i],10,DocId); 
+						//CutSentenceInFitLength(tokens[i],3,DocId);
+						//CutSentenceInFitLength(tokens[i],10,DocId); 
 					}
 	        	}
 	        	else{
-	        		System.out.println("此單字不會納入資料庫：我甚麼都不是："+tokens[i]);
+	        		//System.out.println("此單字不會納入資料庫：我甚麼都不是："+tokens[i]);
 	        	}
 			}
 			else{
-				System.out.println("此單字不會納入資料庫：我是蝦密："+tokens[i]);
+				//System.out.println("此單字不會納入資料庫：我是蝦密："+tokens[i]);
 			}
         }
 		
@@ -218,20 +285,21 @@ public class SearchEngine {
 	//將中英文常句子切除一個
 	public static void CutSentenceInFitLength(String sentence,int fitlong,int DocId){
 		
-		int begin =0;
+		int begin =1;
 		while(sentence.length()>0){
 			if(sentence.length() < fitlong){
-				DBQurry_updateInvertfile(sentence,DocId,Processing_DoId_Position);
+				DBQurry_updateInvertfile(sentence,DocId,Processing_DoId_Position,false);
 				Processing_DoId_Position++;
-				System.out.println("建檔,切過的喔: "+sentence);
+				//System.out.println("建檔,切過的喔: "+sentence);
 				return;
-			}else{
+			}
+			else{
 				String subsentence = "";
 				subsentence = sentence.substring(0,fitlong);
-				sentence =  sentence.substring(fitlong,sentence.length());
-				DBQurry_updateInvertfile(sentence,DocId,Processing_DoId_Position);
+				sentence = sentence.substring(fitlong,sentence.length());
+				DBQurry_updateInvertfile(subsentence,DocId,Processing_DoId_Position,false);
 				Processing_DoId_Position++;
-				System.out.println("建檔,切過的喔: "+subsentence);
+				//System.out.println("建檔,切過的喔: "+subsentence);
 			}
 		}
 	}
@@ -288,9 +356,11 @@ public class SearchEngine {
 	
 	//讀完檔 並且依據一行一行讀取 並開始切除token
 	public static void ReadAnFile(String docname,int docid){
-		
+		//String path = "C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data/"+docname;
 		String path = "C:/Users/Vicky/Desktop/resource_raw_data/"+docname;
-		System.out.println("\t***Start Parse DocumnetNo:***"+docid);
+		long startTime = System.currentTimeMillis();
+		System.out.print("\tStart Parse ->\t DocNo:"+ docid+"\t DocName:"+ docname);
+		
 		try{              
             FileInputStream fis = new FileInputStream(path);  
             byte[] lineb = new byte[5000];  //讀取單位大小
@@ -307,23 +377,37 @@ public class SearchEngine {
         }catch(IOException ioe){  
             ioe.printStackTrace();  
         }  
-		System.out.println("\t***End Parse***");
+		
+		long totTime = System.currentTimeMillis()-startTime;
+		SaveUsingTime(docname,docid,totTime);
+		System.out.print("\n\t - Using Time:"+totTime+" -> End Parse.\n");
+	}
+	public static void SaveUsingTime(String docname,int docid,long time){
+		
+		BasicDBObject timeDocument = new BasicDBObject();
+		timeDocument.put("DocID",docid);
+		timeDocument.put("DocName", docname);
+		timeDocument.put("ParseTime",time);
+		
+		collection_ParseTime.insert(timeDocument);
 		
 	}
 	
 	//讀取選取的檔案個數
 	public static void Parse(int min,int max){
 		
+		int totalfile = max-min-1;
+		System.out.println("Start Parse File...");
+		System.out.println("Total files："+ totalfile);
 		String document_name = "";
 		int document_id = 0;
 		for(int i=min;i<max;i++){
 			document_name=fileList.get(i);
-			System.out.println("Parse : No："+i+" Name: "+document_name);
 			document_id = i+1;
-			Processing_DocId = document_id;
 			Processing_DoId_Position = 1;
 			ReadAnFile(document_name,document_id);
 		}
+		System.out.println("End Parse.");
 	}
 		
 	//讀取資料夾中所有的檔案名稱
@@ -334,7 +418,7 @@ public class SearchEngine {
 		if(f.isDirectory()){
 			System.out.println("filename : "+f.getName());//印出我們所讀到的資料夾
 			String []s=f.list(); //宣告一個list
-			System.out.println("size : "+s.length);//印出資料夾裡的檔案個數
+			//System.out.println("size : "+s.length);//印出資料夾裡的檔案個數
 			for(int i=0;i<s.length;i++){
                 //System.out.println(s[i]);
                 fileList.add(s[i]); //將檔名一一存到fileList動態陣列裡面
@@ -350,7 +434,9 @@ public class SearchEngine {
 		try {
 			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
 			db = mongoClient.getDB("IR_Hw1_TestDB");
-			collection_Dictionary = db.getCollection("Dictionary");
+			collection_DictionaryEn = db.getCollection("DictionaryEn");
+			collection_DictionaryCh = db.getCollection("DictionaryCh");
+			collection_ParseTime = db.getCollection("ParseTime");
 		}
 		catch (UnknownHostException e){
 			e.printStackTrace();
