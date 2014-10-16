@@ -10,6 +10,7 @@ import java.text.ParsePosition;
 import java.util.ArrayList;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -51,9 +52,10 @@ public class SearchEngine {
 	private static DBCollection collection_DictionaryEn_x = null;
 	private static DBCollection collection_DictionaryEn_y = null;
 	private static DBCollection collection_DictionaryEn_z = null;
-	private static DBCollection collection_DictionaryEn = null;
+	//private static DBCollection collection_DictionaryEn = null;
 	private static DBCollection collection_DictionaryCh = null;
 	private static DBCollection collection_ParseTime = null;
+	private static DBCollection collection_DBStats = null;
 	private static ArrayList<String> fileList;
 	public static int Processing_DocId =0;
 	private static int Processing_DoId_Position = 0;
@@ -67,7 +69,7 @@ public class SearchEngine {
 		GetAllFileName();
 		
 		//指定建檔之文件範圍進行建檔(Text Mining)
-		int min =0,max=fileList.size(); //檔案從1開始
+		int min =0,max=fileList.size(); //檔案從0開始
 		Parse(min,max);
 		
 		//String test_term = "顆顆顆顆";
@@ -76,8 +78,39 @@ public class SearchEngine {
 		
 		//DBQurry_updateInvertfile(test_term,test_docid,test_position);
 	}
+	public static int CheckFirstLetter(String checkterm){
+		String firstLetter  = "";
+		firstLetter = String.valueOf(checkterm.charAt(0));
+		if(firstLetter.equals("a")) return 1;
+		else if(firstLetter.equals("b"))return 2;
+		else if(firstLetter.equals("c"))return 3;
+		else if(firstLetter.equals("d"))return 4;
+		else if(firstLetter.equals("e"))return 5;
+		else if(firstLetter.equals("f"))return 6;
+		else if(firstLetter.equals("g"))return 7;
+		else if(firstLetter.equals("h"))return 8;
+		else if(firstLetter.equals("i"))return 9;
+		else if(firstLetter.equals("j"))return 10;
+		else if(firstLetter.equals("k"))return 11;
+		else if(firstLetter.equals("l"))return 12;
+		else if(firstLetter.equals("m"))return 13;
+		else if(firstLetter.equals("n"))return 14;
+		else if(firstLetter.equals("o"))return 15;
+		else if(firstLetter.equals("p"))return 16;
+		else if(firstLetter.equals("q"))return 17;
+		else if(firstLetter.equals("r"))return 18;
+		else if(firstLetter.equals("s"))return 19;
+		else if(firstLetter.equals("t"))return 20;
+		else if(firstLetter.equals("u"))return 21;
+		else if(firstLetter.equals("v"))return 22;
+		else if(firstLetter.equals("w"))return 23;
+		else if(firstLetter.equals("x"))return 24;
+		else if(firstLetter.equals("y"))return 25;
+		else  return 26;
+	}
 	public static void DBQurry_updateInvertfile(String Term,int DocId,int Position,Boolean EnForm){
 		
+		int FirstLetterNo=0;
 		//該term已存在 要更新紀錄
 		if(isTermExist(Term,EnForm)){
 	 		
@@ -93,7 +126,35 @@ public class SearchEngine {
 						new BasicDBObject().append("$inc", 
 						new BasicDBObject().append("IDF",1)); 
 	 			if(EnForm){
-	 				collection_DictionaryEn.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				FirstLetterNo = CheckFirstLetter(Term);
+	 				if(FirstLetterNo == 1)	collection_DictionaryEn_a.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 2)	collection_DictionaryEn_b.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 3)	collection_DictionaryEn_c.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 4)	collection_DictionaryEn_d.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 5)	collection_DictionaryEn_e.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 6)	collection_DictionaryEn_f.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 7)	collection_DictionaryEn_g.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 8)	collection_DictionaryEn_h.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 9)	collection_DictionaryEn_i.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 10)collection_DictionaryEn_j.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 11)collection_DictionaryEn_k.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 12)collection_DictionaryEn_l.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 13)collection_DictionaryEn_m.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 14)collection_DictionaryEn_n.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 15)collection_DictionaryEn_o.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 16)collection_DictionaryEn_p.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 17)collection_DictionaryEn_q.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 18)collection_DictionaryEn_r.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 19)collection_DictionaryEn_s.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 20)collection_DictionaryEn_t.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 21)collection_DictionaryEn_u.update(new BasicDBObject().append("Term", Term), updateDocument);                
+	 				else if(FirstLetterNo == 22)collection_DictionaryEn_v.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 23)collection_DictionaryEn_w.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 24)collection_DictionaryEn_x.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else if(FirstLetterNo == 25)collection_DictionaryEn_y.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				else{
+	 					collection_DictionaryEn_z.update(new BasicDBObject().append("Term", Term), updateDocument);
+	 				}
 	 			}
 	 			else{
 	 				collection_DictionaryCh.update(new BasicDBObject().append("Term", Term), updateDocument);
@@ -113,7 +174,35 @@ public class SearchEngine {
 				DBObject updateQuery = new BasicDBObject("Term", Term);
 				DBObject updateCommand = new BasicDBObject("$push", Insert_Document);
 				if(EnForm){
-					collection_DictionaryEn.update(updateQuery,updateCommand);
+					FirstLetterNo = CheckFirstLetter(Term);
+	 				if(FirstLetterNo == 1)	collection_DictionaryEn_a.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 2)	collection_DictionaryEn_b.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 3)	collection_DictionaryEn_c.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 4)	collection_DictionaryEn_d.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 5)	collection_DictionaryEn_e.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 6)	collection_DictionaryEn_f.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 7)	collection_DictionaryEn_g.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 8)	collection_DictionaryEn_h.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 9)	collection_DictionaryEn_i.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 10)collection_DictionaryEn_j.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 11)collection_DictionaryEn_k.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 12)collection_DictionaryEn_l.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 13)collection_DictionaryEn_m.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 14)collection_DictionaryEn_n.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 15)collection_DictionaryEn_o.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 16)collection_DictionaryEn_p.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 17)collection_DictionaryEn_q.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 18)collection_DictionaryEn_r.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 19)collection_DictionaryEn_s.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 20)collection_DictionaryEn_t.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 21)collection_DictionaryEn_u.update(updateQuery, updateCommand);                
+	 				else if(FirstLetterNo == 22)collection_DictionaryEn_v.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 23)collection_DictionaryEn_w.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 24)collection_DictionaryEn_x.update(updateQuery, updateCommand);
+	 				else if(FirstLetterNo == 25)collection_DictionaryEn_y.update(updateQuery, updateCommand);
+	 				else{
+	 					collection_DictionaryEn_z.update(updateQuery, updateCommand);
+	 				}
 				}
 				else{
 					collection_DictionaryCh.update(updateQuery,updateCommand);
@@ -130,7 +219,35 @@ public class SearchEngine {
 				updateQuery.put("InvertedFileList.DocID",DocId);
 		 		BasicDBObject updateCommand = new BasicDBObject("$push", new BasicDBObject("InvertedFileList.$.Position",Position));
 		 		if(EnForm){
-		 			collection_DictionaryEn.update(updateQuery,updateCommand);
+		 			FirstLetterNo = CheckFirstLetter(Term);
+	 				if(FirstLetterNo == 1)	collection_DictionaryEn_a.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 2)	collection_DictionaryEn_b.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 3)	collection_DictionaryEn_c.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 4)	collection_DictionaryEn_d.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 5)	collection_DictionaryEn_e.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 6)	collection_DictionaryEn_f.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 7)	collection_DictionaryEn_g.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 8)	collection_DictionaryEn_h.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 9)	collection_DictionaryEn_i.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 10)collection_DictionaryEn_j.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 11)collection_DictionaryEn_k.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 12)collection_DictionaryEn_l.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 13)collection_DictionaryEn_m.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 14)collection_DictionaryEn_n.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 15)collection_DictionaryEn_o.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 16)collection_DictionaryEn_p.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 17)collection_DictionaryEn_q.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 18)collection_DictionaryEn_r.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 19)collection_DictionaryEn_s.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 20)collection_DictionaryEn_t.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 21)collection_DictionaryEn_u.update(updateQuery,updateCommand);              
+	 				else if(FirstLetterNo == 22)collection_DictionaryEn_v.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 23)collection_DictionaryEn_w.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 24)collection_DictionaryEn_x.update(updateQuery,updateCommand);
+	 				else if(FirstLetterNo == 25)collection_DictionaryEn_y.update(updateQuery,updateCommand);
+	 				else{
+	 					collection_DictionaryEn_z.update(updateQuery,updateCommand);
+	 				}
 		 		}
 		 		else{
 		 			collection_DictionaryCh.update(updateQuery,updateCommand);
@@ -144,7 +261,35 @@ public class SearchEngine {
 						new BasicDBObject().append("$inc", 
 						new BasicDBObject().append("InvertedFileList.$.LocalFrequency",1)); 
 		 		if(EnForm){
-		 			collection_DictionaryEn.update(updateQuery_Frequency,updateDocument);
+		 			FirstLetterNo = CheckFirstLetter(Term);
+	 				if(FirstLetterNo == 1)	collection_DictionaryEn_a.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 2)	collection_DictionaryEn_b.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 3)	collection_DictionaryEn_c.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 4)	collection_DictionaryEn_d.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 5)	collection_DictionaryEn_e.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 6)	collection_DictionaryEn_f.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 7)	collection_DictionaryEn_g.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 8)	collection_DictionaryEn_h.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 9)	collection_DictionaryEn_i.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 10)collection_DictionaryEn_j.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 11)collection_DictionaryEn_k.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 12)collection_DictionaryEn_l.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 13)collection_DictionaryEn_m.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 14)collection_DictionaryEn_n.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 15)collection_DictionaryEn_o.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 16)collection_DictionaryEn_p.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 17)collection_DictionaryEn_q.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 18)collection_DictionaryEn_r.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 19)collection_DictionaryEn_s.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 20)collection_DictionaryEn_t.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 21)collection_DictionaryEn_u.update(updateQuery_Frequency,updateDocument);              
+	 				else if(FirstLetterNo == 22)collection_DictionaryEn_v.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 23)collection_DictionaryEn_w.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 24)collection_DictionaryEn_x.update(updateQuery_Frequency,updateDocument);
+	 				else if(FirstLetterNo == 25)collection_DictionaryEn_y.update(updateQuery_Frequency,updateDocument);
+	 				else{
+	 					collection_DictionaryEn_z.update(updateQuery_Frequency,updateDocument);
+	 				}
 		 		}
 		 		else{
 		 			collection_DictionaryCh.update(updateQuery_Frequency,updateDocument);
@@ -171,7 +316,35 @@ public class SearchEngine {
 			newDocument.put("IDF",1);
 			newDocument.put("InvertedFileList",newInnerInnerDoc);
 			if(EnForm){
-				collection_DictionaryEn.insert(newDocument);
+				FirstLetterNo = CheckFirstLetter(Term);
+ 				if(FirstLetterNo == 1)	collection_DictionaryEn_a.insert(newDocument);
+ 				else if(FirstLetterNo == 2)	collection_DictionaryEn_b.insert(newDocument);
+ 				else if(FirstLetterNo == 3)	collection_DictionaryEn_c.insert(newDocument);
+ 				else if(FirstLetterNo == 4)	collection_DictionaryEn_d.insert(newDocument);
+ 				else if(FirstLetterNo == 5)	collection_DictionaryEn_e.insert(newDocument);
+ 				else if(FirstLetterNo == 6)	collection_DictionaryEn_f.insert(newDocument);
+ 				else if(FirstLetterNo == 7)	collection_DictionaryEn_g.insert(newDocument);
+ 				else if(FirstLetterNo == 8)	collection_DictionaryEn_h.insert(newDocument);
+ 				else if(FirstLetterNo == 9)	collection_DictionaryEn_i.insert(newDocument);
+ 				else if(FirstLetterNo == 10)collection_DictionaryEn_j.insert(newDocument);
+ 				else if(FirstLetterNo == 11)collection_DictionaryEn_k.insert(newDocument);
+ 				else if(FirstLetterNo == 12)collection_DictionaryEn_l.insert(newDocument);
+ 				else if(FirstLetterNo == 13)collection_DictionaryEn_m.insert(newDocument);
+ 				else if(FirstLetterNo == 14)collection_DictionaryEn_n.insert(newDocument);
+ 				else if(FirstLetterNo == 15)collection_DictionaryEn_o.insert(newDocument);
+ 				else if(FirstLetterNo == 16)collection_DictionaryEn_p.insert(newDocument);
+ 				else if(FirstLetterNo == 17)collection_DictionaryEn_q.insert(newDocument);
+ 				else if(FirstLetterNo == 18)collection_DictionaryEn_r.insert(newDocument);
+ 				else if(FirstLetterNo == 19)collection_DictionaryEn_s.insert(newDocument);
+ 				else if(FirstLetterNo == 20)collection_DictionaryEn_t.insert(newDocument);
+ 				else if(FirstLetterNo == 21)collection_DictionaryEn_u.insert(newDocument);              
+ 				else if(FirstLetterNo == 22)collection_DictionaryEn_v.insert(newDocument);
+ 				else if(FirstLetterNo == 23)collection_DictionaryEn_w.insert(newDocument);
+ 				else if(FirstLetterNo == 24)collection_DictionaryEn_x.insert(newDocument);
+ 				else if(FirstLetterNo == 25)collection_DictionaryEn_y.insert(newDocument);
+ 				else{
+ 					collection_DictionaryEn_z.insert(newDocument);
+ 				}
 			}
 			else{
 				collection_DictionaryCh.insert(newDocument);
@@ -189,7 +362,35 @@ public class SearchEngine {
 		allQuery.put("InvertedFileList.DocID",checkdocid);
 		DBCursor cursor;
 		if(EnForm){
-			cursor= collection_DictionaryEn.find(allQuery, fields);
+				int FirstLetterNo = CheckFirstLetter(checkterm);
+				if(FirstLetterNo == 1)	cursor= collection_DictionaryEn_a.find(allQuery, fields);
+				else if(FirstLetterNo == 2)	cursor= collection_DictionaryEn_b.find(allQuery, fields);
+				else if(FirstLetterNo == 3)	cursor= collection_DictionaryEn_c.find(allQuery, fields);
+				else if(FirstLetterNo == 4)	cursor= collection_DictionaryEn_d.find(allQuery, fields);
+				else if(FirstLetterNo == 5)	cursor= collection_DictionaryEn_e.find(allQuery, fields);
+				else if(FirstLetterNo == 6)	cursor= collection_DictionaryEn_f.find(allQuery, fields);
+				else if(FirstLetterNo == 7)	cursor= collection_DictionaryEn_g.find(allQuery, fields);
+				else if(FirstLetterNo == 8)	cursor= collection_DictionaryEn_h.find(allQuery, fields);
+				else if(FirstLetterNo == 9)	cursor= collection_DictionaryEn_i.find(allQuery, fields);
+				else if(FirstLetterNo == 10)cursor= collection_DictionaryEn_j.find(allQuery, fields);
+				else if(FirstLetterNo == 11)cursor= collection_DictionaryEn_k.find(allQuery, fields);
+				else if(FirstLetterNo == 12)cursor= collection_DictionaryEn_l.find(allQuery, fields);
+				else if(FirstLetterNo == 13)cursor= collection_DictionaryEn_m.find(allQuery, fields);
+				else if(FirstLetterNo == 14)cursor= collection_DictionaryEn_n.find(allQuery, fields);
+				else if(FirstLetterNo == 15)cursor= collection_DictionaryEn_o.find(allQuery, fields);
+				else if(FirstLetterNo == 16)cursor= collection_DictionaryEn_p.find(allQuery, fields);
+				else if(FirstLetterNo == 17)cursor= collection_DictionaryEn_q.find(allQuery, fields);
+				else if(FirstLetterNo == 18)cursor= collection_DictionaryEn_r.find(allQuery, fields);
+				else if(FirstLetterNo == 19)cursor= collection_DictionaryEn_s.find(allQuery, fields);
+				else if(FirstLetterNo == 20)cursor= collection_DictionaryEn_t.find(allQuery, fields);
+				else if(FirstLetterNo == 21)cursor= collection_DictionaryEn_u.find(allQuery, fields);       
+				else if(FirstLetterNo == 22)cursor= collection_DictionaryEn_v.find(allQuery, fields);
+				else if(FirstLetterNo == 23)cursor= collection_DictionaryEn_w.find(allQuery, fields);
+				else if(FirstLetterNo == 24)cursor= collection_DictionaryEn_x.find(allQuery, fields);
+				else if(FirstLetterNo == 25)cursor= collection_DictionaryEn_y.find(allQuery, fields);
+				else{
+					cursor= collection_DictionaryEn_z.find(allQuery, fields);
+				}
 		}
 		else{
 			cursor = collection_DictionaryCh.find(allQuery, fields);
@@ -211,7 +412,35 @@ public class SearchEngine {
 		allQuery.put("Term", checkterm);
 		DBCursor cursor;
 		if(EnForm){
-			cursor= collection_DictionaryEn.find(allQuery, fields);
+			int FirstLetterNo = CheckFirstLetter(checkterm);
+			if(FirstLetterNo == 1)	cursor= collection_DictionaryEn_a.find(allQuery, fields);
+			else if(FirstLetterNo == 2)	cursor= collection_DictionaryEn_b.find(allQuery, fields);
+			else if(FirstLetterNo == 3)	cursor= collection_DictionaryEn_c.find(allQuery, fields);
+			else if(FirstLetterNo == 4)	cursor= collection_DictionaryEn_d.find(allQuery, fields);
+			else if(FirstLetterNo == 5)	cursor= collection_DictionaryEn_e.find(allQuery, fields);
+			else if(FirstLetterNo == 6)	cursor= collection_DictionaryEn_f.find(allQuery, fields);
+			else if(FirstLetterNo == 7)	cursor= collection_DictionaryEn_g.find(allQuery, fields);
+			else if(FirstLetterNo == 8)	cursor= collection_DictionaryEn_h.find(allQuery, fields);
+			else if(FirstLetterNo == 9)	cursor= collection_DictionaryEn_i.find(allQuery, fields);
+			else if(FirstLetterNo == 10)cursor= collection_DictionaryEn_j.find(allQuery, fields);
+			else if(FirstLetterNo == 11)cursor= collection_DictionaryEn_k.find(allQuery, fields);
+			else if(FirstLetterNo == 12)cursor= collection_DictionaryEn_l.find(allQuery, fields);
+			else if(FirstLetterNo == 13)cursor= collection_DictionaryEn_m.find(allQuery, fields);
+			else if(FirstLetterNo == 14)cursor= collection_DictionaryEn_n.find(allQuery, fields);
+			else if(FirstLetterNo == 15)cursor= collection_DictionaryEn_o.find(allQuery, fields);
+			else if(FirstLetterNo == 16)cursor= collection_DictionaryEn_p.find(allQuery, fields);
+			else if(FirstLetterNo == 17)cursor= collection_DictionaryEn_q.find(allQuery, fields);
+			else if(FirstLetterNo == 18)cursor= collection_DictionaryEn_r.find(allQuery, fields);
+			else if(FirstLetterNo == 19)cursor= collection_DictionaryEn_s.find(allQuery, fields);
+			else if(FirstLetterNo == 20)cursor= collection_DictionaryEn_t.find(allQuery, fields);
+			else if(FirstLetterNo == 21)cursor= collection_DictionaryEn_u.find(allQuery, fields);       
+			else if(FirstLetterNo == 22)cursor= collection_DictionaryEn_v.find(allQuery, fields);
+			else if(FirstLetterNo == 23)cursor= collection_DictionaryEn_w.find(allQuery, fields);
+			else if(FirstLetterNo == 24)cursor= collection_DictionaryEn_x.find(allQuery, fields);
+			else if(FirstLetterNo == 25)cursor= collection_DictionaryEn_y.find(allQuery, fields);
+			else{
+				cursor= collection_DictionaryEn_z.find(allQuery, fields);
+			}
 		}
 		else{
 			cursor= collection_DictionaryCh.find(allQuery, fields);
@@ -397,6 +626,8 @@ public class SearchEngine {
 	public static void Parse(int min,int max){
 		
 		int totalfile = max-min-1;
+		int DbNo = 2;
+		long startTime = System.currentTimeMillis();
 		System.out.println("Start Parse File...");
 		System.out.println("Total files："+ totalfile);
 		String document_name = "";
@@ -405,7 +636,15 @@ public class SearchEngine {
 			document_name=fileList.get(i);
 			document_id = i+1;
 			Processing_DoId_Position = 1;
+			if(System.currentTimeMillis()-startTime > 10000){
+				startTime = System.currentTimeMillis();
+				BasicDBObject Status = new BasicDBObject(db.getStats());
+				collection_DBStats.insert(Status);
+				ReConnectionMongoDB(Integer.toString(DbNo));
+				DbNo++;
+			}
 			ReadAnFile(document_name,document_id);
+			
 		}
 		System.out.println("End Parse.");
 	}
@@ -428,15 +667,82 @@ public class SearchEngine {
 		
 				
 	}
-	
+	public static void ReConnectionMongoDB(String DBNo){
+		try {
+			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
+			db = mongoClient.getDB("IR_Hw1_DB_"+DBNo);
+			collection_DictionaryEn_a = db.getCollection("DictionaryEnA");
+			collection_DictionaryEn_b = db.getCollection("DictionaryEnB");
+			collection_DictionaryEn_c = db.getCollection("DictionaryEnC");
+			collection_DictionaryEn_d = db.getCollection("DictionaryEnD");
+			collection_DictionaryEn_e = db.getCollection("DictionaryEnE");
+			collection_DictionaryEn_f = db.getCollection("DictionaryEnF");
+			collection_DictionaryEn_g = db.getCollection("DictionaryEnG");
+			collection_DictionaryEn_h = db.getCollection("DictionaryEnH");
+			collection_DictionaryEn_i = db.getCollection("DictionaryEnI");
+			collection_DictionaryEn_j = db.getCollection("DictionaryEnJ");
+			collection_DictionaryEn_k=  db.getCollection("DictionaryEnK");
+			collection_DictionaryEn_l = db.getCollection("DictionaryEnL");
+			collection_DictionaryEn_m = db.getCollection("DictionaryEnM");
+			collection_DictionaryEn_n = db.getCollection("DictionaryEnN");
+			collection_DictionaryEn_o = db.getCollection("DictionaryEnO");
+			collection_DictionaryEn_p = db.getCollection("DictionaryEnP");
+			collection_DictionaryEn_q = db.getCollection("DictionaryEnQ");
+			collection_DictionaryEn_r = db.getCollection("DictionaryEnR");
+			collection_DictionaryEn_s = db.getCollection("DictionaryEnS");
+			collection_DictionaryEn_t = db.getCollection("DictionaryEnT");
+			collection_DictionaryEn_u = db.getCollection("DictionaryEnU");
+			collection_DictionaryEn_v = db.getCollection("DictionaryEnV");
+			collection_DictionaryEn_w = db.getCollection("DictionaryEnW");
+			collection_DictionaryEn_x = db.getCollection("DictionaryEnX");
+			collection_DictionaryEn_y = db.getCollection("DictionaryEnY");
+			collection_DictionaryEn_z = db.getCollection("DictionaryEnZ");
+			
+			//collection_DictionaryEn = db.getCollection("DictionaryEn");
+			collection_DictionaryCh = db.getCollection("DictionaryCh");
+			collection_ParseTime = db.getCollection("ParseTime");
+			collection_DBStats = db.getCollection("DBStats");
+		}
+		catch (UnknownHostException e){
+			e.printStackTrace();
+		}
+	}
 	//連結MongoDB
 	public static void ConnectionMongoDB(){
 		try {
 			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
-			db = mongoClient.getDB("IR_Hw1_TestDB");
-			collection_DictionaryEn = db.getCollection("DictionaryEn");
+			db = mongoClient.getDB("IR_Hw1_DB_1");
+			collection_DictionaryEn_a = db.getCollection("DictionaryEnA");
+			collection_DictionaryEn_b = db.getCollection("DictionaryEnB");
+			collection_DictionaryEn_c = db.getCollection("DictionaryEnC");
+			collection_DictionaryEn_d = db.getCollection("DictionaryEnD");
+			collection_DictionaryEn_e = db.getCollection("DictionaryEnE");
+			collection_DictionaryEn_f = db.getCollection("DictionaryEnF");
+			collection_DictionaryEn_g = db.getCollection("DictionaryEnG");
+			collection_DictionaryEn_h = db.getCollection("DictionaryEnH");
+			collection_DictionaryEn_i = db.getCollection("DictionaryEnI");
+			collection_DictionaryEn_j = db.getCollection("DictionaryEnJ");
+			collection_DictionaryEn_k=  db.getCollection("DictionaryEnK");
+			collection_DictionaryEn_l = db.getCollection("DictionaryEnL");
+			collection_DictionaryEn_m = db.getCollection("DictionaryEnM");
+			collection_DictionaryEn_n = db.getCollection("DictionaryEnN");
+			collection_DictionaryEn_o = db.getCollection("DictionaryEnO");
+			collection_DictionaryEn_p = db.getCollection("DictionaryEnP");
+			collection_DictionaryEn_q = db.getCollection("DictionaryEnQ");
+			collection_DictionaryEn_r = db.getCollection("DictionaryEnR");
+			collection_DictionaryEn_s = db.getCollection("DictionaryEnS");
+			collection_DictionaryEn_t = db.getCollection("DictionaryEnT");
+			collection_DictionaryEn_u = db.getCollection("DictionaryEnU");
+			collection_DictionaryEn_v = db.getCollection("DictionaryEnV");
+			collection_DictionaryEn_w = db.getCollection("DictionaryEnW");
+			collection_DictionaryEn_x = db.getCollection("DictionaryEnX");
+			collection_DictionaryEn_y = db.getCollection("DictionaryEnY");
+			collection_DictionaryEn_z = db.getCollection("DictionaryEnZ");
+			
+			//collection_DictionaryEn = db.getCollection("DictionaryEn");
 			collection_DictionaryCh = db.getCollection("DictionaryCh");
 			collection_ParseTime = db.getCollection("ParseTime");
+			collection_DBStats = db.getCollection("DBStats");
 		}
 		catch (UnknownHostException e){
 			e.printStackTrace();
