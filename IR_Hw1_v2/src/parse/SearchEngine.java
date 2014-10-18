@@ -69,7 +69,8 @@ public class SearchEngine {
 		GetAllFileName();
 		
 		//指定建檔之文件範圍進行建檔(Text Mining)
-		int min =0,max=fileList.size(); //檔案從0開始
+		//int min =15000,max=fileList.size(); //檔案從0開始
+		int min =18155,max=20000; //檔案從0開始
 		Parse(min,max);
 		
 		//String test_term = "顆顆顆顆";
@@ -585,8 +586,8 @@ public class SearchEngine {
 	
 	//讀完檔 並且依據一行一行讀取 並開始切除token
 	public static void ReadAnFile(String docname,int docid){
-		//String path = "C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data/"+docname;
-		String path = "C:/Users/Vicky/Desktop/resource_raw_data/"+docname;
+		String path = "C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data/"+docname;
+		//String path = "C:/Users/Vicky/Desktop/resource_raw_data/"+docname;
 		long startTime = System.currentTimeMillis();
 		System.out.print("\tStart Parse ->\t DocNo:"+ docid+"\t DocName:"+ docname);
 		
@@ -626,7 +627,7 @@ public class SearchEngine {
 	public static void Parse(int min,int max){
 		
 		int totalfile = max-min-1;
-		int DbNo = 2;
+		int DbNo = 522;
 		long startTime = System.currentTimeMillis();
 		System.out.println("Start Parse File...");
 		System.out.println("Total files："+ totalfile);
@@ -636,7 +637,7 @@ public class SearchEngine {
 			document_name=fileList.get(i);
 			document_id = i+1;
 			Processing_DoId_Position = 1;
-			if(System.currentTimeMillis()-startTime > 10000){
+			if(System.currentTimeMillis()-startTime > 80000){ 
 				startTime = System.currentTimeMillis();
 				BasicDBObject Status = new BasicDBObject(db.getStats());
 				collection_DBStats.insert(Status);
@@ -651,8 +652,8 @@ public class SearchEngine {
 		
 	//讀取資料夾中所有的檔案名稱
 	public static void GetAllFileName(){
-		//File f = new File("C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data");  //
-		File f = new File("C:/Users/Vicky/Desktop/resource_raw_data"); //測試用
+		File f = new File("C:/Users/Vicky/Desktop/Information Retrieval/hw1dataset30k/Data");  //
+		//File f = new File("C:/Users/Vicky/Desktop/resource_raw_data"); //測試用
 		fileList = new ArrayList<String>();
 		if(f.isDirectory()){
 			System.out.println("filename : "+f.getName());//印出我們所讀到的資料夾
@@ -670,7 +671,7 @@ public class SearchEngine {
 	public static void ReConnectionMongoDB(String DBNo){
 		try {
 			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
-			db = mongoClient.getDB("IR_Hw1_DB_"+DBNo);
+			db = mongoClient.getDB("IR_Hw1_NBDB_"+DBNo);
 			collection_DictionaryEn_a = db.getCollection("DictionaryEnA");
 			collection_DictionaryEn_b = db.getCollection("DictionaryEnB");
 			collection_DictionaryEn_c = db.getCollection("DictionaryEnC");
@@ -711,7 +712,7 @@ public class SearchEngine {
 	public static void ConnectionMongoDB(){
 		try {
 			mongoClient = new MongoClient(new ServerAddress("localhost", 27017));
-			db = mongoClient.getDB("IR_Hw1_DB_1");
+			db = mongoClient.getDB("IR_Hw1_NBDB_521");
 			collection_DictionaryEn_a = db.getCollection("DictionaryEnA");
 			collection_DictionaryEn_b = db.getCollection("DictionaryEnB");
 			collection_DictionaryEn_c = db.getCollection("DictionaryEnC");
