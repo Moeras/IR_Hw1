@@ -1,9 +1,9 @@
-package parse;
+package search;
 
 public class NewString {
 	public String str;
 
-	  public NewString() {
+	  NewString() {
 	     str = "";
 	  }
 }
